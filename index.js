@@ -4,6 +4,7 @@ const client = new Discord.Client()
 const config = require("./config.json")
 const command = require("./command"); 
 const welcome = require("./welcome");
+const rule = require("./rule");
 const sql = require("./sql");
 const activityTracker = require("./activityTracker")
 
@@ -26,14 +27,12 @@ client.on("ready", () => {
     //                CREATE CONNECTION
     //  sql.init()
     //
-    
+
     welcome(client)
 
     activityTracker(client)
 
-    command(client, "ping", (message) => {
-        message.channel.send("Pong!")
-    })
+    rule()
 
     command(client, "serverinfo", (message) => {
         client.guilds.cache.forEach((guild) => {
