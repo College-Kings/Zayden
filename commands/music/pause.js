@@ -1,10 +1,10 @@
 const music = require("../../musicFunctions")
 
 module.exports = {
-    commands: ["clear"],
+    commands: ["pause"],
     maxArgs: 0,
+    permissionError: "Command is currently in development. Limited to staff use only.",
     callback: (message, arguments, text) => {
-        music.clear(message)
-        message.channel.send("Queue cleared.")
+        music.pause()
     },
 }

@@ -1,37 +1,56 @@
-const fs = require("fs")
-
 const music = require("../../musicFunctions")
 
-const serverConfig = require("../../serverConfigs/CKConfig.json")
+let Queue = music.Queue
 
 module.exports = {
     commands: ["play", "p"],
-    expectedArgs: "<youtube link>",
-    permissionError: "Command is currently in development. Limited to staff use only.",
+    expectedArgs: "<music>",
     minArgs: 1,
-    callback: (message, arguments, text) => {
+    callback: async (message, arguments, text) => {
         if (!message.member.voice.channel) {
             message.reply("You have to be connected to a voice channel before you can use this command!")
             return
         }
 
-        if (!arguments[0].startsWith("https://www.youtube.com/")) {
-            message.reply("Music links must be from YouTube. (https://www.youtube.com/)")
-            return
+        // Create guild config
+        try { music.servers[message.guild.id].queue }
+        catch (error) { music.servers[message.guild.id] = {} }
+
+        if (!music.servers[message.guild.id].queue) {
+            music.servers[message.guild.id].queue = new Queue(message.guild.id)
         }
 
-        // Adds to queue
-        serverConfig.musicQueue.push(arguments[0])
-        music.getSongTitle(arguments[0]).then(songTitle => message.channel.send(`Added ${songTitle} to the Queue.`))
+        let queue = music.servers[message.guild.id].queue
 
-        fs.writeFile("./serverConfigs/CKConfig.json", JSON.stringify(serverConfig, null, 4), function writeJSON(err) {
-            if (err) { return console.log(err); }
-        });
+        const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
+        const playlistPattern = /^.*(list=)([^#\&\?]*).*/gi;
 
-        if (!message.guild.voice) {
+        const url = arguments[0]
+
+        // Adding to queue
+        if (playlistPattern.test(url)) { // if youtube playlist
+            const urls = await queue.getPlaylist(url);
+            message.channel.send(`Added ${urls.length} songs to the Queue.`);
+        } else if (videoPattern.test(url)) { // if single link
+            const songTitle = await queue.getSong(url)
+            message.channel.send(`Added ${songTitle} to the Queue.`)
+        } else {
+            const songTitle = await queue.getSearch(text)
+
+            // Check if song is found
+            if (songTitle) {
+                message.channel.send(`Added ${songTitle} to the Queue.`)
+            } else {
+                message.channel.send("No song found")
+                return
+            }
+        }
+
+        if (!message.guild.voice || !message.guild.voice.channelID && typeof(music.dispatcher) == "undefined") {
             message.member.voice.channel.join().then(connection => { music.play(message, connection) })
         }
+
     },
     permissions: [],
-    requiredRoles: ["Security"],
+    requiredRoles: [],
 }

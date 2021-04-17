@@ -1,4 +1,6 @@
-const { prefix } = require("../Configs/botConfig.json");
+const Discord = require("discord.js")
+
+const { prefix } = require("../configs/botConfig.json");
 const blacklist = require("../blacklist.js");
 const developerUsers = ["211486447369322506"]
 const staffRole = "787004533963358279"
@@ -57,12 +59,15 @@ module.exports = (client, commandOptions) => {
         cooldown = -1,
         permissions = [],
         requiredRoles = [],
+        disabled = false,
         callback
     } = commandOptions
 
     if (typeof commands === "string") {
         commands = [commands];
     }
+
+    if (disabled) { return }
 
     console.log(`Registering command "${commands[0]}"`);
 
@@ -86,6 +91,8 @@ module.exports = (client, commandOptions) => {
         for (const alias of commands) {
             if (content.split(" ")[0].toLowerCase() == `${prefix}${alias.toLowerCase()}`) {
                 
+                if (disabled) { return }
+
                 // if (channel.id != "776139754408247326" && !member.roles.cache.has(staffRole)) {
                 //     message.delete({ reason:"No bot commands outside of #bot-commands" }).then(
                 //         message.reply("Please only use bot commands in <#776139754408247326>.").then(msg => { msg.delete({ timeout:10000 }) })
@@ -104,7 +111,7 @@ module.exports = (client, commandOptions) => {
                     const role = guild.roles.cache.find(role => role.name === requiredRole)
 
                     if (!role || !member.roles.cache.has(role.id) && !developerUsers.includes(member.id)) {
-                        message.reply(`You must have the "${requiredRole}" role to use this command`)
+                        message.reply(permissionError)
                         return
                     }
                 }
@@ -122,10 +129,11 @@ module.exports = (client, commandOptions) => {
                 const arguments = content.split(/[ ]+/)
                 arguments.shift()
 
-                if (arguments.length < minArgs || (
-                    maxArgs !== null && arguments.length > maxArgs
-                )) {
-                    message.reply(`Incorrect syntax! Use ${prefix}${alias} ${expectedArgs}`)
+                if (arguments.length < minArgs || ( maxArgs !== null && arguments.length > maxArgs )) {
+                    const embed = new Discord.MessageEmbed()
+                    .setColor("#ff0000")
+                    .setDescription(`Invalid command usage, try using it like:\n\`${prefix}${alias} ${expectedArgs}\``)
+                    message.channel.send(embed)
                     return
                 }
 

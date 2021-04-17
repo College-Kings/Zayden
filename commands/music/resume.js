@@ -1,10 +1,17 @@
 const music = require("../../musicFunctions")
 
 module.exports = {
-    commands: ["skip", "s", "next", "n"],
+    commands: ["resume"],
     permissionError: "Command is currently in development. Limited to staff use only.",
     callback: (message, arguments, text) => {
-        music.skip()
+
+        if (!message.guild.voice.connection.dispatcher) {
+            message.reply("No music playing.")
+            return
+        }
+
+        music.resume()
+
     },
     permissions: [],
     requiredRoles: [],

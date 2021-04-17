@@ -1,15 +1,20 @@
-const ytdl = require("ytdl-core")
+const music = require("../../musicFunctions")
 
-const serverConfig = require("../../serverConfigs/CKConfig.json")
+function getQueue(queue) {
+    // if (serverConfig.trackPosition + 1 >= serverConfig.musicQueue.length) {
+    //     return "End of queue. Use `!play` to queue some music up."
+    // }
 
-async function getQueue() {
-    let queue = ""
-    for (let i = 0; i < serverConfig.musicQueue.length; i++) {
-        const info = await ytdl.getInfo(serverConfig.musicQueue[i]);
-        const songTitle = info.videoDetails.title
-            queue += `${i+1}. ${songTitle}\n`
+    let queueText = ""
+    for (let i = 0; i < 26; i++) {
+        if (i < queue.currentQueue.length) {
+            const song = queue.currentQueue[i]
+            queueText += `${i+1}. ${song.title}\n`
+        } else {
+            break
+        }
     }
-    return queue
+    return queueText
 }
 
 module.exports = {
@@ -17,14 +22,16 @@ module.exports = {
     permissionError: "Command is currently in development. Limited to staff use only.",
     maxArgs: 1,
     callback: (message, arguments, text) => {
-        if (serverConfig.musicQueue.length == 0) {
-            message.reply("The queue is empty. Use `!play` to queue some music up.")
-            return
-        }
-        getQueue().then( queue => message.channel.send(`**Music Queue**\n\n${queue}`) );
 
-        
+        const queue = music.servers[message.guild.id].queue
+
+        if (!queue.nowPlaying) {
+            message.channel.send("End of queue. Use `!play` to queue some music up.")
+            return;
+        }
+
+        const queueText = getQueue(queue)
+        message.channel.send(`**Music Queue**\nNow Playing: ${queue.nowPlaying.title}\n\n${queueText}`) 
+
     },
-    permissions: [],
-    requiredRoles: ["Security"],
 }

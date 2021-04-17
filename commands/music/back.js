@@ -1,10 +1,9 @@
 const music = require("../../musicFunctions")
 
 module.exports = {
-    commands: ["clear"],
+    commands: ["back", "b", "previous", "prev"],
     maxArgs: 0,
     callback: (message, arguments, text) => {
-        music.clear(message)
-        message.channel.send("Queue cleared.")
+        music.back(message)
     },
 }
