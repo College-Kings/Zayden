@@ -15,7 +15,6 @@ module.exports = {
         try {
             if (message.mentions.members.first().user.id in imgConfig.goodMorningImgs) { arrayId = message.mentions.members.first().user.id }
         }
-        catch (error) { arrayId = "Global" }
 
         const imgId = Math.floor(Math.random() * imgConfig.goodMorningImgs[arrayId].length)
 
