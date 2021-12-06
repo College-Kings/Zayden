@@ -4,7 +4,7 @@ const { prefix } = require("../../configs/bot_config.json")
 module.exports = {
     commands: ["help", "h", "?"],
     description: "Zayden Help Command",
-    callback: (message, arguments, text) => {
+    _callback: (message, arguments, text) => {
         let reply = "Zayden's Commands:\n"
 
         const commands = loadCommands(message.client)
@@ -16,7 +16,7 @@ module.exports = {
 
             // Check for permissions
             if (permissions) {
-                if (message.guild == null) { continue }
+                if (message.guild == null) { continue} 
 
                 if (typeof permissions === "string") {
                     permissions = [permissions]
@@ -32,7 +32,7 @@ module.exports = {
 
             // Check for requiredRoles
             if (roles) {
-                if (message.guild == null) { continue }
+                if (message.guild == null) { continue} 
                 if (typeof roles === "string") {
                     roles = [roles]
                 }
@@ -50,14 +50,20 @@ module.exports = {
             if (!hasPermission) {
                 continue
             }
-            
+
             const mainCommand = typeof command.commands === "string" ? command.commands : command.commands[0]
             const args = command.expectedArgs ? ` ${command.expectedArgs}` : ""
-            
-            reply += `**${prefix}${mainCommand}${args}**\n`
-            
+
+            reply = `**${prefix}${mainCommand}${args}**\n`
+
         }
 
         message.channel.send(reply)
+    },
+    get callback() {
+        return this._callback
+    },
+    set callback(value) {
+        this._callback = value
     },
 }
