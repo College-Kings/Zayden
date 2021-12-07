@@ -1,7 +1,7 @@
-const loadCommands = require("../load_commands")
-const { prefix } = require("../../configs/bot_config.json")
+import loadCommands from "../load_commands"
+import { prefix } from "../../configs/bot_config.json"
 
-module.exports = {
+export default {
     commands: ["help", "h", "?"],
     description: "Zayden Help Command",
     _callback: (message, arguments, text) => {
@@ -65,5 +65,5 @@ module.exports = {
     },
     set callback(value) {
         this._callback = value
-    },
+    }
 }
