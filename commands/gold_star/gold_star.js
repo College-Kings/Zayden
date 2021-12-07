@@ -42,5 +42,5 @@ module.exports = {
         .setDescription(`<@${member.id}> received a golden star from <@${author.id}> for a total of ${member_config["number_of_stars"]} stars`);
 
         message.channel.send({embeds: [embed]});
-    },
+    }
 }

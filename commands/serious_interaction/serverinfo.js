@@ -25,5 +25,5 @@ module.exports = {
         .setThumbnail(message.guild.iconURL())
 
         message.channel.send({embeds: [embed]})
-    },
+    }
 }

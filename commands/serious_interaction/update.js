@@ -84,5 +84,5 @@ module.exports = {
             .setFooter("https://www.patreon.com/collegekings")
 
         message.reply({embeds: [embed]})
-    },
+    }
 }
