@@ -82,8 +82,7 @@ pub async fn run(ctx: &Context, msg: &Message) {
 
     let replies = process_referenced_messages(ctx, msg);
 
-    let response = match chatgpt_lib::chat(&parsed_message, author_name, replies).await
-    {
+    let response = match chatgpt_lib::chat(&parsed_message, author_name, replies).await {
         Ok(response) => response,
         Err(why) => {
             msg.reply(&ctx, format!("Error: {}", why)).await.unwrap();

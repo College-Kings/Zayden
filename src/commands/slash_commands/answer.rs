@@ -1,15 +1,20 @@
-use serenity::builder::CreateApplicationCommand;
-use serenity::model::Permissions;
-use serenity::model::prelude::application_command::{ApplicationCommandInteraction, CommandDataOptionValue};
-use serenity::model::prelude::ChannelId;
-use serenity::model::prelude::command::CommandOptionType;
-use serenity::prelude::Context;
 use crate::sqlx_lib::update_question_answer;
 use crate::utils::respond_with_message;
+use serenity::builder::CreateApplicationCommand;
+use serenity::model::prelude::application_command::{
+    ApplicationCommandInteraction, CommandDataOptionValue,
+};
+use serenity::model::prelude::command::CommandOptionType;
+use serenity::model::prelude::ChannelId;
+use serenity::model::Permissions;
+use serenity::prelude::Context;
 
 const QUESTION_CHANNEL_ID: u64 = 829463308629180447;
 
-pub async fn run(ctx: &Context, interaction: &ApplicationCommandInteraction) -> Result<(), serenity::Error> {
+pub async fn run(
+    ctx: &Context,
+    interaction: &ApplicationCommandInteraction,
+) -> Result<(), serenity::Error> {
     let id = match interaction.data.options[0].resolved.as_ref() {
         Some(CommandDataOptionValue::Integer(id)) => id,
         _ => return respond_with_message(ctx, interaction, "Invalid question ID").await,
@@ -27,13 +32,26 @@ pub async fn run(ctx: &Context, interaction: &ApplicationCommandInteraction) -> 
 
     let question_channel = ChannelId(QUESTION_CHANNEL_ID);
 
-    let mut msg = question_channel.message(ctx, question.message_id.unwrap() as u64).await.unwrap();
-    let msg_result = msg.edit(ctx, |message| {
-        message.embed(|e| {
-            e.field(format!("Question ID: {}", question.id), question.question, false)
-                .field(format!("Answered by {}", interaction.user.name), answer, false)
+    let mut msg = question_channel
+        .message(ctx, question.message_id.unwrap() as u64)
+        .await
+        .unwrap();
+    let msg_result = msg
+        .edit(ctx, |message| {
+            message.embed(|e| {
+                e.field(
+                    format!("Question ID: {}", question.id),
+                    question.question,
+                    false,
+                )
+                .field(
+                    format!("Answered by {}", interaction.user.name),
+                    answer,
+                    false,
+                )
+            })
         })
-    }).await;
+        .await;
 
     if msg_result.is_err() {
         return respond_with_message(ctx, interaction, "Error updating question").await;
@@ -43,17 +61,20 @@ pub async fn run(ctx: &Context, interaction: &ApplicationCommandInteraction) -> 
 }
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("answer")
+    command
+        .name("answer")
         .description("Answer a user's question")
         .default_member_permissions(Permissions::MANAGE_MESSAGES)
         .create_option(|option| {
-            option.name("question_id")
+            option
+                .name("question_id")
                 .description("The ID of the question to answer")
                 .kind(CommandOptionType::Integer)
                 .required(true)
         })
         .create_option(|option| {
-            option.name("answer")
+            option
+                .name("answer")
                 .description("The answer to the question")
                 .kind(CommandOptionType::String)
                 .required(true)

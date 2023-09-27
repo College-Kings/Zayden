@@ -38,14 +38,14 @@ impl EventHandler for Handler {
 
     async fn reaction_add(&self, ctx: Context, reaction: Reaction) {
         let (reaction_roles, reaction_message, mut member) =
-            match get_reaction_data(&ctx, &reaction).await {
-                Ok(reaction_data) => reaction_data,
-                Err(why) => return println!("{}", why),
-            };
+                match get_reaction_data(&ctx, &reaction).await {
+                    Ok(reaction_data) => reaction_data,
+                    Err(why) => return println!("{}", why),
+                };
 
         for reaction_role in reaction_roles {
             if (reaction_message.id.0 != reaction_role.message_id as u64)
-                || (reaction.emoji.to_string() != reaction_role.emoji)
+                    || (reaction.emoji.to_string() != reaction_role.emoji)
             {
                 continue;
             }
@@ -64,14 +64,14 @@ impl EventHandler for Handler {
 
     async fn reaction_remove(&self, ctx: Context, reaction: Reaction) {
         let (reaction_roles, reaction_message, mut member) =
-            match get_reaction_data(&ctx, &reaction).await {
-                Ok(reaction_data) => reaction_data,
-                Err(why) => return println!("{}", why),
-            };
+                match get_reaction_data(&ctx, &reaction).await {
+                    Ok(reaction_data) => reaction_data,
+                    Err(why) => return println!("{}", why),
+                };
 
         for reaction_role in reaction_roles {
             if (reaction_message.id.0 != reaction_role.message_id as u64)
-                || (reaction.emoji.to_string() != reaction_role.emoji)
+                    || (reaction.emoji.to_string() != reaction_role.emoji)
             {
                 continue;
             }
@@ -96,41 +96,41 @@ impl EventHandler for Handler {
         // Deploy Commands
         GuildId::set_application_commands(&GuildId(COLLEGE_KINGS_GUILD_ID), &ctx, |commands| {
             commands
-                .create_application_command(|command| add_artist::register(command))
-                .create_application_command(|command| answer::register(command))
-                .create_application_command(|command| close::register(command))
-                .create_application_command(|command| fetch_suggestions::register(command))
-                .create_application_command(|command| fixed::register(command))
-                .create_application_command(|command| get_discord_role::register(command))
-                .create_application_command(|command| open::register(command))
-                .create_application_command(|command| patreon::register(command))
-                .create_application_command(|command| good_morning::register(command))
-                .create_application_command(|command| good_night::register(command))
-                .create_application_command(|command| question::register(command))
-                .create_application_command(|command| reputation::register(command))
-                .create_application_command(|command| saves::register(command))
-                .create_application_command(|command| spoilers::register(command))
-                .create_application_command(|command| update_information_message::register(command))
+                    .create_application_command(|command| add_artist::register(command))
+                    .create_application_command(|command| answer::register(command))
+                    .create_application_command(|command| close::register(command))
+                    .create_application_command(|command| fetch_suggestions::register(command))
+                    .create_application_command(|command| fixed::register(command))
+                    .create_application_command(|command| get_discord_role::register(command))
+                    .create_application_command(|command| open::register(command))
+                    .create_application_command(|command| patreon::register(command))
+                    .create_application_command(|command| good_morning::register(command))
+                    .create_application_command(|command| good_night::register(command))
+                    .create_application_command(|command| question::register(command))
+                    .create_application_command(|command| reputation::register(command))
+                    .create_application_command(|command| saves::register(command))
+                    .create_application_command(|command| spoilers::register(command))
+                    .create_application_command(|command| update_information_message::register(command))
         })
-        .await
-        .expect("Failed to register slash command");
+                .await
+                .expect("Failed to register slash command");
 
         Command::set_global_application_commands(&ctx, |commands| {
             commands
-                .create_application_command(|command| gold_star::register(command))
-                .create_application_command(|command| infraction::register(command))
-                .create_application_command(|command| logs::register(command))
-                .create_application_command(|command| member_count::register(command))
-                .create_application_command(|command| ping::register(command))
-                .create_application_command(|command| reaction_role::register(command))
-                .create_application_command(|command| rule::register(command))
-                .create_application_command(|command| scam::register(command))
-                .create_application_command(|command| server_info::register(command))
-                .create_application_command(|command| stars::register(command))
-                .create_application_command(|command| support::register(command))
+                    .create_application_command(|command| gold_star::register(command))
+                    .create_application_command(|command| infraction::register(command))
+                    .create_application_command(|command| logs::register(command))
+                    .create_application_command(|command| member_count::register(command))
+                    .create_application_command(|command| ping::register(command))
+                    .create_application_command(|command| reaction_role::register(command))
+                    .create_application_command(|command| rule::register(command))
+                    .create_application_command(|command| scam::register(command))
+                    .create_application_command(|command| server_info::register(command))
+                    .create_application_command(|command| stars::register(command))
+                    .create_application_command(|command| support::register(command))
         })
-        .await
-        .expect("Failed to register slash command");
+                .await
+                .expect("Failed to register slash command");
 
         let mut activity = Activity::playing("College Kings");
         activity.url = Some("https://www.patreon.com/collegekings".parse().unwrap());

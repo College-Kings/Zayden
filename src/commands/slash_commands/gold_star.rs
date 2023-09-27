@@ -1,10 +1,12 @@
+use crate::models::GoldStar;
+use crate::sqlx_lib::{add_star_to_user, create_user, get_gold_stars, remove_star_from_author};
+use crate::utils::{respond_with_embed, respond_with_message};
 use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::application_command::{ApplicationCommandInteraction, CommandDataOptionValue};
+use serenity::model::prelude::application_command::{
+    ApplicationCommandInteraction, CommandDataOptionValue,
+};
 use serenity::model::prelude::command::CommandOptionType;
 use serenity::prelude::Context;
-use crate::models::GoldStar;
-use crate::sqlx_lib::{create_user, get_gold_stars, remove_star_from_author, add_star_to_user};
-use crate::utils::{respond_with_embed, respond_with_message};
 
 const STARS_TO_GIVE: i32 = 1;
 
@@ -13,11 +15,16 @@ async fn get_user_stars(user_id: u64) -> Result<GoldStar, String> {
 
     match get_gold_stars(user_id).await {
         Ok(stars) => Ok(stars),
-        Err(_) => create_user(user_id, 0, 0).await.map_err(|_| "Error creating user".to_string()),
+        Err(_) => create_user(user_id, 0, 0)
+            .await
+            .map_err(|_| "Error creating user".to_string()),
     }
 }
 
-pub async fn run(ctx: &Context, interaction: &ApplicationCommandInteraction) -> Result<(), serenity::Error> {
+pub async fn run(
+    ctx: &Context,
+    interaction: &ApplicationCommandInteraction,
+) -> Result<(), serenity::Error> {
     let author = &interaction.user;
 
     let member = match interaction.data.options[0].resolved.as_ref() {
@@ -33,14 +40,21 @@ pub async fn run(ctx: &Context, interaction: &ApplicationCommandInteraction) -> 
 
     let author_stars = match get_user_stars(author.id.0).await {
         Ok(stars) => stars,
-        Err(_) => return respond_with_message(ctx, interaction, "Error retrieving author stars").await,
+        Err(_) => {
+            return respond_with_message(ctx, interaction, "Error retrieving author stars").await
+        }
     };
     let member_stars = match get_user_stars(member.id.0).await {
         Ok(stars) => stars,
-        Err(_) => return respond_with_message(ctx, interaction, "Error retrieving member stars").await,
+        Err(_) => {
+            return respond_with_message(ctx, interaction, "Error retrieving member stars").await
+        }
     };
 
-    let has_free_star = author_stars.last_free_star.map(|star| star.timestamp() >= 86400).unwrap_or(true);
+    let has_free_star = author_stars
+        .last_free_star
+        .map(|star| star.timestamp() >= 86400)
+        .unwrap_or(true);
 
     if author_stars.number_of_stars < STARS_TO_GIVE && !has_free_star {
         return respond_with_message(ctx, interaction, "You don't have enough stars to give").await;
@@ -53,7 +67,12 @@ pub async fn run(ctx: &Context, interaction: &ApplicationCommandInteraction) -> 
         return respond_with_message(ctx, interaction, "Error adding star to member").await;
     }
 
-    let mut description = format!("{} received a golden star from {} for a total of **{}** stars.", member, author, member_stars.number_of_stars + STARS_TO_GIVE);
+    let mut description = format!(
+        "{} received a golden star from {} for a total of **{}** stars.",
+        member,
+        author,
+        member_stars.number_of_stars + STARS_TO_GIVE
+    );
 
     if let Some(reason) = reason {
         if let Some(CommandDataOptionValue::String(reason)) = reason.resolved.as_ref() {
@@ -62,9 +81,9 @@ pub async fn run(ctx: &Context, interaction: &ApplicationCommandInteraction) -> 
     }
 
     respond_with_embed(ctx, interaction, |e| {
-        e.title("⭐ NEW GOLDEN STAR ⭐")
-            .description(description)
-    }).await
+        e.title("⭐ NEW GOLDEN STAR ⭐").description(description)
+    })
+    .await
 }
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {

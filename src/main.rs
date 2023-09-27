@@ -1,10 +1,10 @@
+mod chatgpt_lib;
 mod commands;
 mod handler;
+mod infraction_type;
 mod models;
 mod sqlx_lib;
-mod chatgpt_lib;
 mod utils;
-mod infraction_type;
 
 use dotenvy::dotenv;
 use serenity::prelude::GatewayIntents;

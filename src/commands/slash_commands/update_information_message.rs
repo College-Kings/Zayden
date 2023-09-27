@@ -1,13 +1,16 @@
-use serenity::builder::{CreateApplicationCommand, CreateEmbed};
-use serenity::model::Permissions;
-use serenity::model::prelude::application_command::ApplicationCommandInteraction;
-use serenity::prelude::Context;
 use crate::utils::respond_with_ephemeral_message;
+use serenity::builder::{CreateApplicationCommand, CreateEmbed};
+use serenity::model::prelude::application_command::ApplicationCommandInteraction;
+use serenity::model::Permissions;
+use serenity::prelude::Context;
 
 const INFORMATION_MESSAGE_ID: u64 = 830931135780880415;
 const INFORMATION_CHANNEL_ID: u64 = 830927865784565800;
 
-pub async fn run(ctx: &Context, interaction: &ApplicationCommandInteraction) -> Result<(), serenity::Error> {
+pub async fn run(
+    ctx: &Context,
+    interaction: &ApplicationCommandInteraction,
+) -> Result<(), serenity::Error> {
     let mut embed = CreateEmbed::default();
     embed.title("College Kings");
     embed.description(r#"This server is about the game "College Kings". The game is still in active development. Supporting the game on patreon helps us a lot, so if you have the resources, consider joining the patreon.
@@ -49,15 +52,25 @@ https://patreon.com/collegekings"#);
 
 Fan/Activity Roles:
 <@&787443819024220210>, <@&787445571539304510>, <@&787445900992577556>, <@&787446715057831976>, <@&787447090728796191>, <@&787447252783202326>"#, false);
-    embed.field("Special Mentions", r#"Special Mentions
-Thank you to <@828728276193116181> for the College Kings' stickers"#, false);
+    embed.field(
+        "Special Mentions",
+        r#"Special Mentions
+Thank you to <@828728276193116181> for the College Kings' stickers"#,
+        false,
+    );
 
-    let mut message = ctx.http.get_message(INFORMATION_CHANNEL_ID, INFORMATION_MESSAGE_ID).await?;
+    let mut message = ctx
+        .http
+        .get_message(INFORMATION_CHANNEL_ID, INFORMATION_MESSAGE_ID)
+        .await?;
     message.edit(ctx, |m| m.set_embed(embed)).await?;
 
     respond_with_ephemeral_message(ctx, interaction, "Message Updated.").await
 }
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("update_information").description("Update the information message").default_member_permissions(Permissions::ADMINISTRATOR)
+    command
+        .name("update_information")
+        .description("Update the information message")
+        .default_member_permissions(Permissions::ADMINISTRATOR)
 }

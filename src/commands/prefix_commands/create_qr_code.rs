@@ -1,9 +1,9 @@
 use reqwest::Client;
 use serde_json::json;
-use std::collections::HashMap;
-use std::env;
 use serenity::model::channel::Message;
 use serenity::prelude::Context;
+use std::collections::HashMap;
+use std::env;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct LovenseQrCodeResponse {
@@ -25,7 +25,12 @@ pub async fn run(ctx: Context, msg: Message) {
 
     let client = Client::new();
 
-    if let Ok(res) = client.post("https://api.lovense.com/api/lan/getQrCode").json(&data).send().await {
+    if let Ok(res) = client
+        .post("https://api.lovense.com/api/lan/getQrCode")
+        .json(&data)
+        .send()
+        .await
+    {
         let response_json = res.json::<LovenseQrCodeResponse>().await.unwrap();
         let qr_code_url = response_json.data.get("qr").unwrap();
 

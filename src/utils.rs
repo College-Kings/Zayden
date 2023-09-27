@@ -31,7 +31,7 @@ pub async fn edit_response_with_message(ctx: &Context, interaction: &Application
 
 pub async fn respond_with_embed<F>(ctx: &Context, interaction: &ApplicationCommandInteraction, embed: F) -> Result<(), serenity::Error>
     where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+            F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
 {
     interaction.create_interaction_response(&ctx, |response| {
         response.kind(InteractionResponseType::ChannelMessageWithSource);
